@@ -33,5 +33,46 @@ contract("DappToken", async function (accounts) {
       assert.equal(name, "Dapp Token", "correct name");
       assert.equal(symbol, "DAPTKN", "correct symbol");
     });
+
+    it("check balance control in transfer function", async () => {
+      try {
+        await DappTokenContract.transfer(accounts[1], 99999999999, {
+          from: accounts[0],
+        });
+      } catch (e) {
+        assert(
+          e.message.indexOf("revert") >= 0,
+          "error message must contain revert"
+        );
+      }
+    });
+
+    it("check token transfer and event", async () => {
+      const result = await DappTokenContract.transfer(accounts[1], 100, {
+        from: accounts[0],
+      });
+
+      // Check balance
+      const accountBalance = await DappTokenContract.balanceOf(accounts[1]);
+      assert.equal(accountBalance.toNumber(), 100, "check transfered balance");
+
+      //Check event is emited
+      assert.equal(
+        result.logs[0].args._from,
+        accounts[0],
+        "check sender in event"
+      );
+      assert.equal(
+        result.logs[0].args._to,
+        accounts[1],
+        "check receiver in event"
+      );
+
+      assert.equal(
+        result.logs[0].args._value.toNumber(),
+        100,
+        "check value in event"
+      );
+    });
   });
 });
