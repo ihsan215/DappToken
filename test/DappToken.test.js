@@ -74,5 +74,35 @@ contract("DappToken", async function (accounts) {
         "check value in event"
       );
     });
+
+    it("check approve", async () => {
+      const result = await DappTokenContract.approve(accounts[1], 100, {
+        from: accounts[0],
+      });
+
+      //Check event is emited
+      assert.equal(
+        result.logs[0].args._owner,
+        accounts[0],
+        "check sender in event"
+      );
+      assert.equal(
+        result.logs[0].args._spender,
+        accounts[1],
+        "check receiver in event"
+      );
+
+      assert.equal(
+        result.logs[0].args._value.toNumber(),
+        100,
+        "check value in event"
+      );
+
+      const allowence = await DappTokenContract.allowance(
+        accounts[0],
+        accounts[1]
+      );
+      assert.equal(allowence.toNumber(), 100, "check allowence");
+    });
   });
 });
