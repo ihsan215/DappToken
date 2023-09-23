@@ -29,11 +29,20 @@ contract DappTokenSale{
 
         require(msg.value == mulitply(_numberOfTokens , tokenPrice));
         require(tokenContract.balanceOf(address(this)) >=_numberOfTokens );
+        require(tokenContract.transfer(msg.sender,_numberOfTokens));
         
         tokenSold += _numberOfTokens;
 
         emit Sell(msg.sender, _numberOfTokens);
 
+    }
+
+
+    // Ending token sale
+    function endSale() public {
+        require(msg.sender == admin);
+        require(tokenContract.transfer(admin, tokenContract.balanceOf(address(this))));
+        selfdestruct(address(this));
     }
 
 

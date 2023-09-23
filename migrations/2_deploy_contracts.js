@@ -7,11 +7,8 @@ module.exports = async function (deployer) {
   const DappTokenInstance = await DappToken.deployed();
   const DapptokenAdr = await DappTokenInstance.address;
 
-  console.log(DappToken.address);
-
   await deployer.deploy(DappTokenSale, DapptokenAdr, TokenPrice);
 
   const saleIntance = await DappTokenSale.deployed();
   const adr = await saleIntance.address;
-  console.log(adr);
 };

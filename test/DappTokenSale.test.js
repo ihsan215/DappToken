@@ -12,8 +12,6 @@ contract("DappTokenSale", async function (accounts) {
     before(async function () {
       TokenInstance = await DappToken.deployed();
       ContractInstance = await DappTokenSale.deployed();
-      console.log(TokenInstance.address);
-      console.log(ContractInstance.address);
 
       await TokenInstance.transfer(ContractInstance.address, tokensAvailable, {
         from: admin,
@@ -78,6 +76,37 @@ contract("DappTokenSale", async function (accounts) {
       } catch (error) {
         assert(error.message.indexOf("revert") >= 0, "too much token sale");
       }
+    });
+
+    it("check transfer the token", async () => {
+      await ContractInstance.buyTokens(100, {
+        from: accounts[2],
+        value: 100 * TokenPrice,
+      });
+      const balance = await TokenInstance.balanceOf(accounts[2]);
+      assert.equal(balance.toNumber(), 100, "Check token sale");
+    });
+
+    it("check endsaling", async () => {
+      // check only admin call
+      try {
+        await ContractInstance.endSale({
+          from: accounts[2],
+        });
+      } catch (e) {
+        assert(e.message.indexOf("revert") >= 0, "only admin call the func");
+      }
+
+      await ContractInstance.endSale({
+        from: admin,
+      });
+
+      const balance = await TokenInstance.balanceOf(admin);
+      assert.equal(
+        balance.toNumber(),
+        999890,
+        "rest of balance must equal to admin's token"
+      );
     });
   });
 });
